@@ -1,9 +1,14 @@
 require 'rubygems/command'
 require 'rubygems/local_remote_options'
 require 'rubygems/version_option'
-require 'rubygems/dependency_resolver'
 
 class Gem::Commands::DeepFetchCommand < Gem::Command
+
+  if RUBY_VERSION >= "2.1.0"
+    require 'rubygems/resolver'
+  else
+    require 'rubygems/dependency_resolver'
+  end
 
   include Gem::LocalRemoteOptions
   include Gem::VersionOption
@@ -45,6 +50,14 @@ deep_fetch is usefull to examine new packages before installing them.
     "#{program_name} GEMNAME [GEMNAME ...]"
   end
 
+  def gem_resolver
+    if RUBY_VERSION >= "2.1.0"
+      Gem::Resolver
+    else
+      Gem::DependencyResolver
+    end
+  end
+
   def execute
     version = options[:version] || Gem::Requirement.default
     gem_names = get_all_gem_names
@@ -53,7 +66,7 @@ deep_fetch is usefull to examine new packages before installing them.
       Gem::Dependency.new gem_name, version
     end
 
-    resolver = Gem::DependencyResolver.new deps;
+    resolver = gem_resolver.new deps;
     action_requests = resolver.resolve;
 
     action_requests.reject do |ar|
