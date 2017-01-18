@@ -17,7 +17,7 @@ class Gem::Commands::DeepFetchCommand < Gem::Command
     add_clear_sources_option
 
     add_version_option
-    # TODO add_platform_option
+    add_platform_option
     # TODO add_prerelease_option
   end
 
