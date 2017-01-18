@@ -17,6 +17,13 @@ class Gem::Commands::DeepFetchCommand < Gem::Command
     add_clear_sources_option
 
     add_version_option
+
+    add_option('-f', '--force', '--[no-]-force',
+               'Force gems to download, even if installed'
+              ) do |value, options|
+      options[:force] = value
+    end
+
     # TODO add_platform_option
     # TODO add_prerelease_option
   end
@@ -57,7 +64,7 @@ deep_fetch is usefull to examine new packages before installing them.
     action_requests = resolver.resolve;
 
     action_requests.reject do |ar|
-      ar.installed?
+      ar.installed? unless options[:force]
     end.each do |ar|
       spec = ar.spec
       full_spec = spec.spec
